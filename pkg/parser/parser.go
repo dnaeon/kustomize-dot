@@ -51,17 +51,17 @@ func ResourcesFromPath(path string) ([]*resource.Resource, error) {
 // dependency graph out of it.
 //
 // The vertices in the graph represent the [resource.Resource] instances, which
-// are connected via edges to their origin metadata.
+// are connected via edges to their origins.
 type Parser struct {
-	// highlightMap contains mappings between Kubernetes Resource kinds and
-	// and the color with which to paint resources of this kind.
-	highlightMap map[string]string
+	// highlightKindMap contains mappings between Kubernetes resource kinds
+	// and the color with which to paint resources of such kind.
+	highlightKindMap map[string]string
 }
 
 // New creates a new [Parser] and configures it using the specified options.
 func New(opts ...Option) *Parser {
 	p := &Parser{
-		highlightMap: make(map[string]string),
+		highlightKindMap: make(map[string]string),
 	}
 
 	for _, opt := range opts {
@@ -76,9 +76,9 @@ type Option func(p *Parser)
 
 // WithHighlight is an [Option] which configures the [Parser] to highlight
 // resources with the specified Kubernetes Resource kind and color.
-func WithHighlight(kind string, color string) Option {
+func WithHighlightKind(kind string, color string) Option {
 	opt := func(p *Parser) {
-		p.highlightMap[strings.ToLower(kind)] = color
+		p.highlightKindMap[strings.ToLower(kind)] = color
 	}
 
 	return opt
@@ -89,33 +89,48 @@ func WithHighlight(kind string, color string) Option {
 func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], error) {
 	g := graph.New[string](graph.KindDirected)
 
-	for _, resource := range resources {
-		u := vertexNameFromResource(resource)
-		g.AddVertex(u)
+	for _, r := range resources {
+		// Add u to the graph, and paint the vertex
+		uName := p.vertexNameFromResource(r)
+		u := g.AddVertex(uName)
+		p.applyHighlights(u, r)
 
-		origin, err := resource.GetOrigin()
+		// Add v to the graph, which represents the resource origin
+		origin, err := r.GetOrigin()
 		if err != nil {
 			return nil, err
 		}
 
+		// No origin metadata found, skip it
 		if origin == nil {
 			continue
 		}
 
-		v := vertexNameFromOrigin(origin)
-		g.AddVertex(v)
+		vName := p.vertexNameFromOrigin(origin)
+		g.AddVertex(vName)
 
-		e := g.AddEdge(u, v)
-		label := edgeLabelFromOrigin(origin)
+		e := g.AddEdge(uName, vName)
+		label := p.edgeLabelFromOrigin(origin)
 		e.DotAttributes["label"] = label
 	}
 
 	return g, nil
 }
 
+// applyHighlights applies the highlight styles to the [graph.Vertex] u for
+// [resource.Resource] r.
+func (p *Parser) applyHighlights(u *graph.Vertex[string], r *resource.Resource) {
+	kind := strings.ToLower(r.GetKind())
+	color, ok := p.highlightKindMap[kind]
+	if ok {
+		u.DotAttributes["color"] = color
+		u.DotAttributes["fillcolor"] = color
+	}
+}
+
 // vertexNameFromResource returns a string representing the vertex name for the
 // given [resource.Resource].
-func vertexNameFromResource(r *resource.Resource) string {
+func (p *Parser) vertexNameFromResource(r *resource.Resource) string {
 	namespace := r.GetNamespace()
 	name := r.GetName()
 	kind := strings.ToLower(r.GetKind())
@@ -131,7 +146,7 @@ func vertexNameFromResource(r *resource.Resource) string {
 
 // vertexNameFromOrigin returns a string representing the vertex name for the
 // given [resource.Origin].
-func vertexNameFromOrigin(origin *resource.Origin) string {
+func (p *Parser) vertexNameFromOrigin(origin *resource.Origin) string {
 	switch {
 	case origin.ConfiguredIn != "":
 		// Generator or transformer created resource
@@ -149,7 +164,7 @@ func vertexNameFromOrigin(origin *resource.Origin) string {
 }
 
 // edgeLabelFromOrigin returns a string to be used as an edge label.
-func edgeLabelFromOrigin(origin *resource.Origin) string {
+func (p *Parser) edgeLabelFromOrigin(origin *resource.Origin) string {
 	switch {
 	case origin.ConfiguredIn != "":
 		// Generator or transformer created resource
