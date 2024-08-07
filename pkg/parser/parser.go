@@ -5,6 +5,7 @@ package parser
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"gopkg.in/dnaeon/go-graph.v1"
@@ -33,6 +34,17 @@ func ResourcesFromBytes(data []byte) ([]*resource.Resource, error) {
 // by the given sequence of [yaml.RNode] items.
 func ResourcesFromRNodes(items []*yaml.RNode) ([]*resource.Resource, error) {
 	return NewResourceFactory().ResourcesFromRNodes(items)
+}
+
+// ResourcesFromPath returns the list of [resource.Resource] items by parsing
+// the Kubernetes resources from the given path.
+func ResourcesFromPath(path string) ([]*resource.Resource, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return ResourcesFromBytes(data)
 }
 
 // Parser knows how to parse a sequence of [resource.Resource] items and build a
