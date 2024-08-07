@@ -52,7 +52,24 @@ func ResourcesFromPath(path string) ([]*resource.Resource, error) {
 //
 // The vertices in the graph represent the [resource.Resource] instances, which
 // are connected via edges to their origin metadata.
-type Parser struct{}
+type Parser struct {
+	// highlightMap contains mappings between Kubernetes Resource kinds and
+	// and the color with which to paint resources of this kind.
+	highlightMap map[string]string
+}
+
+// Option is a function which configures the [Parser].
+type Option func(p *Parser)
+
+// WithHighlight is an [Option] which configures the [Parser] to highlight
+// resources with the specified Kubernetes Resource kind and color.
+func WithHighlight(kind string, color string) Option {
+	opt := func(p *Parser) {
+		p.highlightMap[kind] = color
+	}
+
+	return opt
+}
 
 // Parse parses the given sequence of [resource.Resource] items in order to
 // generate a directed [graph.Graph].
