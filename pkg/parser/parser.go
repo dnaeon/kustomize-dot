@@ -58,6 +58,19 @@ type Parser struct {
 	highlightMap map[string]string
 }
 
+// New creates a new [Parser] and configures it using the specified options.
+func New(opts ...Option) *Parser {
+	p := &Parser{
+		highlightMap: make(map[string]string),
+	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
+}
+
 // Option is a function which configures the [Parser].
 type Option func(p *Parser)
 
@@ -65,7 +78,7 @@ type Option func(p *Parser)
 // resources with the specified Kubernetes Resource kind and color.
 func WithHighlight(kind string, color string) Option {
 	opt := func(p *Parser) {
-		p.highlightMap[kind] = color
+		p.highlightMap[strings.ToLower(kind)] = color
 	}
 
 	return opt
