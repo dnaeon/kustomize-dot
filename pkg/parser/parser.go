@@ -10,6 +10,7 @@ import (
 	"gopkg.in/dnaeon/go-graph.v1"
 	"sigs.k8s.io/kustomize/api/provider"
 	"sigs.k8s.io/kustomize/api/resource"
+	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 // NewDepProvider creates a new [provider.DepProvider].
@@ -20,6 +21,18 @@ func NewDepProvider() *provider.DepProvider {
 // NewResourceFactory creates a new [resource.Factory]
 func NewResourceFactory() *resource.Factory {
 	return NewDepProvider().GetResourceFactory()
+}
+
+// ResourcesFromBytes returns the list of [resource.Resource] items contained
+// within the given data.
+func ResourcesFromBytes(data []byte) ([]*resource.Resource, error) {
+	return NewResourceFactory().SliceFromBytes(data)
+}
+
+// ResourcesFromRNodes returns the list of [resource.Resource] items represented
+// by the given sequence of [yaml.RNode] items.
+func ResourcesFromRNodes(items []*yaml.RNode) ([]*resource.Resource, error) {
+	return NewResourceFactory().ResourcesFromRNodes(items)
 }
 
 // Parser knows how to parse a sequence of [resource.Resource] items and build a
