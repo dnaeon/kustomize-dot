@@ -14,6 +14,28 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
+// LayoutDirection is a type which represents the direction of the graph layout.
+type LayoutDirection string
+
+// String implements the [fmt.Stringer] interface
+func (ld LayoutDirection) String() string {
+	return string(ld)
+}
+
+const (
+	// LayoutDirectionTB specifies Top-to-Botton layout
+	LayoutDirectionTB LayoutDirection = "TB"
+
+	// LayoutDirectionBT specifies Botton-to-Top layout
+	LayoutDirectionBT LayoutDirection = "BT"
+
+	// LayoutDirectionLR specifies Left-to-Right layout
+	LayoutDirectionLR LayoutDirection = "LR"
+
+	// LayoutDirectionRL specifies Right-to-Left layout
+	LayoutDirectionRL LayoutDirection = "RL"
+)
+
 // NewDepProvider creates a new [provider.DepProvider].
 func NewDepProvider() *provider.DepProvider {
 	return provider.NewDefaultDepProvider()
@@ -61,6 +83,9 @@ type Parser struct {
 	// namespaces and the color with which to paint all resources from the
 	// respective namespace.
 	highlightNamespaceMap map[string]string
+
+	// layoutDirection specifies the direction of graph layout.
+	layoutDirection LayoutDirection
 }
 
 // New creates a new [Parser] and configures it using the specified options.
@@ -100,6 +125,16 @@ func WithHighlightNamespace(namespace string, color string) Option {
 	return opt
 }
 
+// WithLayoutDirection is an [Option] which configures the [Parser] to generate
+// the graph with the specified direction.
+func WithLayoutDirection(layout LayoutDirection) Option {
+	opt := func(p *Parser) {
+		p.layoutDirection = layout
+	}
+
+	return opt
+}
+
 // Parse parses the given sequence of [resource.Resource] items in order to
 // generate a directed [graph.Graph].
 func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], error) {
@@ -129,6 +164,10 @@ func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], err
 		label := p.edgeLabelFromOrigin(origin)
 		e.DotAttributes["label"] = label
 	}
+
+	// Set direction of graph layout and other graph-specific attributes
+	graphAttrs := g.GetDotAttributes()
+	graphAttrs["rankdir"] = p.layoutDirection.String()
 
 	return g, nil
 }
