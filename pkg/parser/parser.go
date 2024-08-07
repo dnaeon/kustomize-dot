@@ -54,14 +54,20 @@ func ResourcesFromPath(path string) ([]*resource.Resource, error) {
 // are connected via edges to their origins.
 type Parser struct {
 	// highlightKindMap contains mappings between Kubernetes resource kinds
-	// and the color with which to paint resources of such kind.
+	// and the color with which to paint resources with the respective kind.
 	highlightKindMap map[string]string
+
+	// highlightNamespaceMap contains the mapping between Kubernetes
+	// namespaces and the color with which to paint all resources from the
+	// respective namespace.
+	highlightNamespaceMap map[string]string
 }
 
 // New creates a new [Parser] and configures it using the specified options.
 func New(opts ...Option) *Parser {
 	p := &Parser{
-		highlightKindMap: make(map[string]string),
+		highlightKindMap:      make(map[string]string),
+		highlightNamespaceMap: make(map[string]string),
 	}
 
 	for _, opt := range opts {
@@ -74,11 +80,21 @@ func New(opts ...Option) *Parser {
 // Option is a function which configures the [Parser].
 type Option func(p *Parser)
 
-// WithHighlight is an [Option] which configures the [Parser] to highlight
-// resources with the specified Kubernetes Resource kind and color.
+// WithHighlightKind is an [Option] which configures the [Parser] to paint resources
+// with the specified Kubernetes Resource Kind with the specified color.
 func WithHighlightKind(kind string, color string) Option {
 	opt := func(p *Parser) {
 		p.highlightKindMap[strings.ToLower(kind)] = color
+	}
+
+	return opt
+}
+
+// WithHighlightNamespace is an [Option] which configures the [Parser] to paint
+// all resources from the given namespace with the specified color.
+func WithHighlightNamespace(namespace string, color string) Option {
+	opt := func(p *Parser) {
+		p.highlightNamespaceMap[strings.ToLower(namespace)] = color
 	}
 
 	return opt
@@ -120,11 +136,21 @@ func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], err
 // applyHighlights applies the highlight styles to the [graph.Vertex] u for
 // [resource.Resource] r.
 func (p *Parser) applyHighlights(u *graph.Vertex[string], r *resource.Resource) {
+	// First we paint resources by namespace
+	namespace := strings.ToLower(r.GetNamespace())
 	kind := strings.ToLower(r.GetKind())
-	color, ok := p.highlightKindMap[kind]
+
+	namespaceColor, ok := p.highlightNamespaceMap[namespace]
 	if ok {
-		u.DotAttributes["color"] = color
-		u.DotAttributes["fillcolor"] = color
+		u.DotAttributes["color"] = namespaceColor
+		u.DotAttributes["fillcolor"] = namespaceColor
+	}
+
+	// Then we paint resources by kind
+	kindColor, ok := p.highlightKindMap[kind]
+	if ok {
+		u.DotAttributes["color"] = kindColor
+		u.DotAttributes["fillcolor"] = kindColor
 	}
 }
 
