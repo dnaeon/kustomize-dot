@@ -27,31 +27,25 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"slices"
 
+	"github.com/dnaeon/kustomize-dot/pkg/parser"
 	"github.com/urfave/cli/v2"
 )
 
-func main() {
-	app := &cli.App{
-		Name:                 "kustomize-dot",
-		Version:              "0.1.0",
-		EnableBashCompletion: true,
-		Suggest:              true,
-		Usage:                "tool for generating graphs from kustomize resources",
-		Authors: []*cli.Author{
-			{
-				Name:  "Marin Atanasov Nikolov",
-				Email: "dnaeon@gmail.com",
-			},
-		},
-		Commands: []*cli.Command{
-			newGenerateCommand(),
-		},
+// getLayoutDirection returns the graph layout direction from the CLI context
+func getLayoutDirection(ctx *cli.Context) (parser.LayoutDirection, error) {
+	supportedLayouts := []parser.LayoutDirection{
+		parser.LayoutDirectionBT,
+		parser.LayoutDirectionTB,
+		parser.LayoutDirectionLR,
+		parser.LayoutDirectionRL,
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		os.Exit(1)
+	layout := parser.LayoutDirection(ctx.String("layout"))
+	if !slices.Contains(supportedLayouts, layout) {
+		return parser.LayoutDirection(""), fmt.Errorf("%w: %s", errUnsupportedLayout, layout)
 	}
+
+	return layout, nil
 }
