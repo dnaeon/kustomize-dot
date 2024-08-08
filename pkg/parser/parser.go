@@ -85,6 +85,10 @@ type Parser struct {
 
 	// layoutDirection specifies the direction of graph layout.
 	layoutDirection LayoutDirection
+
+	// dropResourceKinds contains the list of resource kinds, which will be
+	// dropped from the resulting graph.
+	dropResourceKinds []string
 }
 
 // New creates a new [Parser] and configures it using the specified options.
@@ -93,6 +97,7 @@ func New(opts ...Option) *Parser {
 		highlightKindMap:      make(map[string]string),
 		highlightNamespaceMap: make(map[string]string),
 		layoutDirection:       LayoutDirectionLR,
+		dropResourceKinds:     make([]string, 0),
 	}
 
 	for _, opt := range opts {
@@ -135,12 +140,26 @@ func WithLayoutDirection(layout LayoutDirection) Option {
 	return opt
 }
 
+// WithDropKind is an [Option], which configures the [Parser] to drop the
+// specified Kubernetes resource kind from the resulting graph.
+func WithDropKind(kind string) Option {
+	opt := func(p *Parser) {
+		p.dropResourceKinds = append(p.dropResourceKinds, strings.ToLower(kind))
+	}
+
+	return opt
+}
+
 // Parse parses the given sequence of [resource.Resource] items in order to
 // generate a directed [graph.Graph].
 func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], error) {
 	g := graph.New[string](graph.KindDirected)
 
 	for _, r := range resources {
+		if p.shouldDropResource(r) {
+			continue
+		}
+
 		// Add u to the graph, and paint the vertex
 		uName := p.vertexNameFromResource(r)
 		u := g.AddVertex(uName)
@@ -170,6 +189,19 @@ func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], err
 	graphAttrs["rankdir"] = p.layoutDirection.String()
 
 	return g, nil
+}
+
+// shouldDropResource is a predicate, which returns true, if the resource is to
+// be dropped from the graph, and returns false otherwise.
+func (p *Parser) shouldDropResource(r *resource.Resource) bool {
+	kind := strings.ToLower(r.GetKind())
+	for _, drk := range p.dropResourceKinds {
+		if kind == drk {
+			return true
+		}
+	}
+
+	return false
 }
 
 // applyHighlights applies the highlight styles to the [graph.Vertex] u for
