@@ -89,6 +89,11 @@ type Parser struct {
 	// dropResourceKinds contains the list of resource kinds, which will be
 	// dropped from the resulting graph.
 	dropResourceKinds []string
+
+	// dropNamespaces contains the list of namespaces, from which
+	// any resource in the specified namespaces will be dropped from the
+	// resulting graph.
+	dropNamespaces []string
 }
 
 // New creates a new [Parser] and configures it using the specified options.
@@ -98,6 +103,7 @@ func New(opts ...Option) *Parser {
 		highlightNamespaceMap: make(map[string]string),
 		layoutDirection:       LayoutDirectionLR,
 		dropResourceKinds:     make([]string, 0),
+		dropNamespaces:        make([]string, 0),
 	}
 
 	for _, opt := range opts {
@@ -150,6 +156,16 @@ func WithDropKind(kind string) Option {
 	return opt
 }
 
+// WithDropNamespace is an [Option], which configures the [Parser] to drop all
+// resources from the specified namespace.
+func WithDropNamespace(namespace string) Option {
+	opt := func(p *Parser) {
+		p.dropNamespaces = append(p.dropNamespaces, strings.ToLower(namespace))
+	}
+
+	return opt
+}
+
 // Parse parses the given sequence of [resource.Resource] items in order to
 // generate a directed [graph.Graph].
 func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], error) {
@@ -195,6 +211,16 @@ func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], err
 // be dropped from the graph, and returns false otherwise.
 func (p *Parser) shouldDropResource(r *resource.Resource) bool {
 	kind := strings.ToLower(r.GetKind())
+	namespace := strings.ToLower(r.GetNamespace())
+
+	// Drop resource, if it is part of any drop-namespaces
+	for _, dn := range p.dropNamespaces {
+		if namespace == dn {
+			return true
+		}
+	}
+
+	// Drop resource, if it is part of any drop-kinds
 	for _, drk := range p.dropResourceKinds {
 		if kind == drk {
 			return true
