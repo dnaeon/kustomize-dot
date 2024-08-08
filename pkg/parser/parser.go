@@ -94,6 +94,11 @@ type Parser struct {
 	// any resource in the specified namespaces will be dropped from the
 	// resulting graph.
 	dropNamespaces []string
+
+	// keepNamespaces contains the list of namespaces, from which resources
+	// will be kept. Any resource, which is not in the specified namespaces
+	// will be dropped.
+	keepNamespaces []string
 }
 
 // New creates a new [Parser] and configures it using the specified options.
@@ -104,6 +109,7 @@ func New(opts ...Option) *Parser {
 		layoutDirection:       LayoutDirectionLR,
 		dropResourceKinds:     make([]string, 0),
 		dropNamespaces:        make([]string, 0),
+		keepNamespaces:        make([]string, 0),
 	}
 
 	for _, opt := range opts {
@@ -161,6 +167,17 @@ func WithDropKind(kind string) Option {
 func WithDropNamespace(namespace string) Option {
 	opt := func(p *Parser) {
 		p.dropNamespaces = append(p.dropNamespaces, strings.ToLower(namespace))
+	}
+
+	return opt
+}
+
+// WithKeepNamespace is an [Option], which configures the [Parser] to keep only
+// resources from the specified namespace. Any other resource will be dropped
+// from the resulting graph.
+func WithKeepNamespace(namespace string) Option {
+	opt := func(p *Parser) {
+		p.keepNamespaces = append(p.keepNamespaces, strings.ToLower(namespace))
 	}
 
 	return opt
@@ -225,6 +242,16 @@ func (p *Parser) shouldDropResource(r *resource.Resource) bool {
 		if kind == drk {
 			return true
 		}
+	}
+
+	// Drop resources, if we have keep-namespaces configured
+	if len(p.keepNamespaces) > 0 {
+		for _, kn := range p.keepNamespaces {
+			if namespace == kn {
+				return false
+			}
+		}
+		return true
 	}
 
 	return false
