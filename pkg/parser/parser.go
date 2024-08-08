@@ -1,6 +1,5 @@
 // Package parser provides utilities for generating dependency graphs by parsing
-// Kubernetes resources produced by `kustomize build'.
-
+// Kubernetes resources produced by kustomize build.
 package parser
 
 import (
@@ -93,6 +92,7 @@ func New(opts ...Option) *Parser {
 	p := &Parser{
 		highlightKindMap:      make(map[string]string),
 		highlightNamespaceMap: make(map[string]string),
+		layoutDirection:       LayoutDirectionLR,
 	}
 
 	for _, opt := range opts {
@@ -106,7 +106,7 @@ func New(opts ...Option) *Parser {
 type Option func(p *Parser)
 
 // WithHighlightKind is an [Option] which configures the [Parser] to paint resources
-// with the specified Kubernetes Resource Kind with the specified color.
+// with the given Kubernetes Resource Kind with the specified color.
 func WithHighlightKind(kind string, color string) Option {
 	opt := func(p *Parser) {
 		p.highlightKindMap[strings.ToLower(kind)] = color
