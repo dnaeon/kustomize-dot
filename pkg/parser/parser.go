@@ -95,6 +95,11 @@ type Parser struct {
 	// resulting graph.
 	dropNamespaces []string
 
+	// keepResourceKinds contains the list of resource kinds, which will be
+	// kept. Any other resource kind will be dropped from the resulting
+	// graph.
+	keepResourceKinds []string
+
 	// keepNamespaces contains the list of namespaces, from which resources
 	// will be kept. Any resource, which is not in the specified namespaces
 	// will be dropped.
@@ -109,6 +114,7 @@ func New(opts ...Option) *Parser {
 		layoutDirection:       LayoutDirectionLR,
 		dropResourceKinds:     make([]string, 0),
 		dropNamespaces:        make([]string, 0),
+		keepResourceKinds:     make([]string, 0),
 		keepNamespaces:        make([]string, 0),
 	}
 
@@ -157,6 +163,17 @@ func WithLayoutDirection(layout LayoutDirection) Option {
 func WithDropKind(kind string) Option {
 	opt := func(p *Parser) {
 		p.dropResourceKinds = append(p.dropResourceKinds, strings.ToLower(kind))
+	}
+
+	return opt
+}
+
+// WithKeepKind is an [Option], which configures the [Parser] to keep only
+// resources of the given kind. Any other resource kind will be dropped from the
+// resulting graph.
+func WithKeepKind(kind string) Option {
+	opt := func(p *Parser) {
+		p.keepResourceKinds = append(p.keepResourceKinds, strings.ToLower(kind))
 	}
 
 	return opt
@@ -237,24 +254,55 @@ func (p *Parser) shouldDropResource(r *resource.Resource) bool {
 		}
 	}
 
-	// Drop resource, if it is part of any drop-kinds
+	// Drop resource, if it is part of any drop-resource-kinds
 	for _, drk := range p.dropResourceKinds {
 		if kind == drk {
 			return true
 		}
 	}
 
-	// Drop resources, if we have keep-namespaces configured
+	// Drop resources, if they are outside of the configured keep-namespaces
+	keepNamespaceIsSet := false
+	keepKindIsSet := false
+	foundKeepNamespace := false
+	foundKeepKind := false
 	if len(p.keepNamespaces) > 0 {
+		keepNamespaceIsSet = true
 		for _, kn := range p.keepNamespaces {
 			if namespace == kn {
-				return false
+				foundKeepNamespace = true
+				break
 			}
 		}
-		return true
 	}
 
-	return false
+	// Drop resources, if they are not part of the configured
+	// keep-resource-kinds.
+	if len(p.keepResourceKinds) > 0 {
+		keepKindIsSet = true
+		for _, krk := range p.keepResourceKinds {
+			if kind == krk {
+				foundKeepKind = true
+				break
+			}
+		}
+	}
+
+	switch {
+	case keepNamespaceIsSet && !foundKeepNamespace:
+		// Resource is not part of the keep-namespaces, so drop it.
+		return true
+	case keepNamespaceIsSet && keepKindIsSet && foundKeepNamespace && !foundKeepKind:
+		// Resource is part of the keep-namespaces, but not part of the
+		// keep-resource-kinds, so drop it.
+		return true
+	case keepKindIsSet && !foundKeepKind:
+		// Resource is not part of the keep-resource-kinds, so drop it
+		return true
+	default:
+		// Don't drop the resource
+		return false
+	}
 }
 
 // applyHighlights applies the highlight styles to the [graph.Vertex] u for
