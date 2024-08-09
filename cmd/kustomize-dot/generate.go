@@ -26,8 +26,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/dnaeon/kustomize-dot/pkg/parser"
 	"github.com/urfave/cli/v2"
+	"gopkg.in/dnaeon/go-graph.v1"
 )
 
 // newGenerateCommand returns the command for generating dot representation of
@@ -54,33 +57,37 @@ func newGenerateCommand() *cli.Command {
 			&cli.StringSliceFlag{
 				Name:    "highlight-kind",
 				Usage:   "highlight resources of a given kind with specified color",
-				Aliases: []string{"kind-color"},
+				Aliases: []string{"kind-color", "hk"},
 				EnvVars: []string{"HIGHLIGHT_KIND", "KIND_COLOR"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "highlight-namespace",
 				Usage:   "highlight resources from a given namespace with specified color",
-				Aliases: []string{"namespace-color"},
+				Aliases: []string{"namespace-color", "hn"},
 				EnvVars: []string{"HIGHLIGHT_NAMESPACE", "NAMESPACE_COLOR"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "drop-kind",
 				Usage:   "drop resources of the given kind",
+				Aliases: []string{"dk"},
 				EnvVars: []string{"DROP_KIND"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "drop-namespace",
 				Usage:   "drop all resources from the given namespace",
+				Aliases: []string{"dn"},
 				EnvVars: []string{"DROP_NAMESPACE"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "keep-kind",
 				Usage:   "keep resources of the given kind only",
+				Aliases: []string{"kk"},
 				EnvVars: []string{"KEEP_KIND"},
 			},
 			&cli.StringSliceFlag{
 				Name:    "keep-namespace",
 				Usage:   "keep resources from the given namespace only",
+				Aliases: []string{"kn"},
 				EnvVars: []string{"KEEP_NAMESPACE"},
 			},
 		},
@@ -97,10 +104,66 @@ func execGenerateCommand(ctx *cli.Context) error {
 		return err
 	}
 
+	// graph layout direction
 	opts := make([]parser.Option, 0)
 	opts = append(opts, parser.WithLayoutDirection(layout))
 
-	// TODO: Parse the rest of the options and add them as options
+	// highlight-kind options
+	hkValues := ctx.StringSlice("highlight-kind")
+	hkPairs, err := parseKV(hkValues...)
+	if err != nil {
+		return err
+	}
+	for _, pair := range hkPairs {
+		opts = append(opts, parser.WithHighlightKind(pair.key, pair.val))
+	}
 
-	return nil
+	// highlight-namespace options
+	hnValues := ctx.StringSlice("highlight-namespace")
+	hnPairs, err := parseKV(hnValues...)
+	if err != nil {
+		return err
+	}
+	for _, pair := range hnPairs {
+		opts = append(opts, parser.WithHighlightNamespace(pair.key, pair.val))
+	}
+
+	// drop-kind options
+	dkValues := ctx.StringSlice("drop-kind")
+	for _, dk := range dkValues {
+		opts = append(opts, parser.WithDropKind(dk))
+	}
+
+	// drop-namespace options
+	dnValues := ctx.StringSlice("drop-namespace")
+	for _, dn := range dnValues {
+		opts = append(opts, parser.WithDropNamespace(dn))
+	}
+
+	// keep-kind options
+	kkValues := ctx.StringSlice("keep-kind")
+	for _, kk := range kkValues {
+		opts = append(opts, parser.WithKeepKind(kk))
+	}
+
+	// keep-namespace options
+	knValues := ctx.StringSlice("keep-namespace")
+	for _, kn := range knValues {
+		opts = append(opts, parser.WithKeepNamespace(kn))
+	}
+
+	// Generate the graph of resources
+	file := ctx.Path("file")
+	resources, err := parser.ResourcesFromPath(file)
+	if err != nil {
+		return err
+	}
+
+	p := parser.New(opts...)
+	g, err := p.Parse(resources)
+	if err != nil {
+		return err
+	}
+
+	return graph.WriteDot(g, os.Stdout)
 }
