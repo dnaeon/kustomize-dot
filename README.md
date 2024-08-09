@@ -5,13 +5,18 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/dnaeon/kustomize-dot)](https://goreportcard.com/report/github.com/dnaeon/kustomize-dot)
 [![codecov](https://codecov.io/gh/dnaeon/kustomize-dot/branch/master/graph/badge.svg)](https://codecov.io/gh/dnaeon/kustomize-dot)
 
-`kustomize-dot` is a kustomize plugin which generates a dependency graph of the
-Kubernetes resources produced by `kustomize build`.
+`kustomize-dot` is a CLI and
+[KRM Function plugin](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md),
+which generates a graph of Kubernetes resources produced by
+[kustomize](https://kustomize.io/).
+
+![Example Graph](./images/image-1.svg)
 
 ## Requirements
 
-* Go version 1.21.x or later
+* Go version 1.22.x or later
 * Docker for local development
+* [kustomize](https://kustomize.io/) for building manifests
 
 ## Installation
 
