@@ -26,7 +26,6 @@
 package main
 
 import (
-	"io"
 	"os"
 
 	"github.com/dnaeon/kustomize-dot/pkg/parser"
@@ -160,8 +159,7 @@ func execGenerateCommand(ctx *cli.Context) error {
 	file := ctx.Path("file")
 	if file == "-" {
 		// Special case for resources passed on stdin
-		data, err := io.ReadAll(os.Stdin)
-		resources, err = parser.ResourcesFromBytes(data)
+		resources, err = parser.ResourcesFromReader(os.Stdin)
 		if err != nil {
 			return err
 		}
