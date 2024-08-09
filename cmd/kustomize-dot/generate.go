@@ -26,11 +26,13 @@
 package main
 
 import (
+	"io"
 	"os"
 
 	"github.com/dnaeon/kustomize-dot/pkg/parser"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/dnaeon/go-graph.v1"
+	"sigs.k8s.io/kustomize/api/resource"
 )
 
 // newGenerateCommand returns the command for generating dot representation of
@@ -152,11 +154,22 @@ func execGenerateCommand(ctx *cli.Context) error {
 		opts = append(opts, parser.WithKeepNamespace(kn))
 	}
 
-	// Generate the graph of resources
+	// Read the resources and generate the graph
+	var resources []*resource.Resource
+
 	file := ctx.Path("file")
-	resources, err := parser.ResourcesFromPath(file)
-	if err != nil {
-		return err
+	if file == "-" {
+		// Special case for resources passed on stdin
+		data, err := io.ReadAll(os.Stdin)
+		resources, err = parser.ResourcesFromBytes(data)
+		if err != nil {
+			return err
+		}
+	} else {
+		resources, err = parser.ResourcesFromPath(file)
+		if err != nil {
+			return err
+		}
 	}
 
 	p := parser.New(opts...)
