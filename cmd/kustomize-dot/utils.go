@@ -26,12 +26,26 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/dnaeon/kustomize-dot/pkg/parser"
 	"github.com/urfave/cli/v2"
 )
+
+// errUnsupportedLayout is returned when the app was called with invalid layout
+// direction.
+var errUnsupportedLayout = errors.New("unsupported graph layout")
+
+// errInvalidKV is an error which is returned when attempting to parse an
+// invalid key/value pair.
+var errInvalidKV = errors.New("invalid key/value pair")
+
+// kvSeparator is the separator used to parse key/value pairs from a string,
+// e.g. foo=bar, bar=baz, etc.
+const kvSeparator = "="
 
 // getLayoutDirection returns the graph layout direction from the CLI context
 func getLayoutDirection(ctx *cli.Context) (parser.LayoutDirection, error) {
@@ -48,4 +62,22 @@ func getLayoutDirection(ctx *cli.Context) (parser.LayoutDirection, error) {
 	}
 
 	return layout, nil
+}
+
+// kv represents a key/value pair.
+type kv struct {
+	key string
+	val string
+}
+
+// parseKV parses a key/value pair from a string. The key/value pair is expected
+// to be in the form of foo=bar, bar=baz, etc.
+func parseKV(val string) (*kv, error) {
+	parts := strings.Split(val, kvSeparator)
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("%w: %s", errInvalidKV, val)
+	}
+	pair := &kv{key: parts[0], val: parts[1]}
+
+	return pair, nil
 }
