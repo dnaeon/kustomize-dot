@@ -70,14 +70,18 @@ type kv struct {
 	val string
 }
 
-// parseKV parses a key/value pair from a string. The key/value pair is expected
-// to be in the form of foo=bar, bar=baz, etc.
-func parseKV(val string) (*kv, error) {
-	parts := strings.Split(val, kvSeparator)
-	if len(parts) != 2 {
-		return nil, fmt.Errorf("%w: %s", errInvalidKV, val)
+// parseKV parses a key/value pairs. The key/value pairs are expected to be in
+// the form of foo=bar, bar=baz, etc.
+func parseKV(values ...string) ([]*kv, error) {
+	pairs := make([]*kv, 0)
+	for _, val := range values {
+		parts := strings.Split(val, kvSeparator)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("%w: %s", errInvalidKV, val)
+		}
+		pair := &kv{key: parts[0], val: parts[1]}
+		pairs = append(pairs, pair)
 	}
-	pair := &kv{key: parts[0], val: parts[1]}
 
-	return pair, nil
+	return pairs, nil
 }
