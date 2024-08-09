@@ -3,6 +3,7 @@ module github.com/dnaeon/kustomize-dot
 go 1.22.6
 
 require (
+	github.com/urfave/cli/v2 v2.27.3
 	gopkg.in/dnaeon/go-graph.v1 v1.0.1
 	sigs.k8s.io/kustomize/api v0.17.3
 	sigs.k8s.io/kustomize/kyaml v0.17.2
@@ -25,7 +26,6 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/urfave/cli/v2 v2.27.3 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	golang.org/x/sys v0.18.0 // indirect
