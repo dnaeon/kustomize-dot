@@ -29,6 +29,7 @@ package parser
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -86,6 +87,17 @@ func ResourcesFromRNodes(items []*yaml.RNode) ([]*resource.Resource, error) {
 // the Kubernetes resources from the given path.
 func ResourcesFromPath(path string) ([]*resource.Resource, error) {
 	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return ResourcesFromBytes(data)
+}
+
+// ResourcesFromReader returns the list of [resource.Resource] items by parsing
+// the Kubernetes resource from the given [io.Reader].
+func ResourcesFromReader(r io.Reader) ([]*resource.Resource, error) {
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
