@@ -20,4 +20,7 @@ test:
 test-cover:
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
-.PHONY: build tidy test test-cover
+docker-build:
+	docker build -t dnaeon/kustomize-dot:latest .
+
+.PHONY: build tidy test test-cover docker-build
