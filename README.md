@@ -5,12 +5,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/dnaeon/kustomize-dot)](https://goreportcard.com/report/github.com/dnaeon/kustomize-dot)
 [![codecov](https://codecov.io/gh/dnaeon/kustomize-dot/branch/master/graph/badge.svg)](https://codecov.io/gh/dnaeon/kustomize-dot)
 
-`kustomize-dot` is a CLI and
+`kustomize-dot` is a CLI and [kustomize](https://kustomize.io/)
 [KRM Function plugin](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md),
-which generates a graph of Kubernetes resources produced by
-[kustomize](https://kustomize.io/).
+which generates a graph of Kubernetes resources and their origin.
 
-![Example Graph](./images/image-1.svg)
+![Hello World](./images/hello-world.svg)
 
 ## Requirements
 
