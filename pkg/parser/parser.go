@@ -39,6 +39,10 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
+// notClonedPrefix is the prefix added by kustomize for the origin annotation,
+// which will be stripped when we generate the graph.
+const notClonedPrefix = "notCloned/"
+
 // LayoutDirection is a type which represents the direction of the graph layout.
 type LayoutDirection string
 
@@ -382,6 +386,8 @@ func (p *Parser) vertexNameFromResource(r *resource.Resource) string {
 // vertexNameFromOrigin returns a string representing the vertex name for the
 // given [resource.Origin].
 func (p *Parser) vertexNameFromOrigin(origin *resource.Origin) string {
+	path := origin.Path
+	path = strings.TrimPrefix(path, notClonedPrefix)
 	switch {
 	case origin.ConfiguredIn != "":
 		// Generator or transformer created resource
@@ -389,12 +395,12 @@ func (p *Parser) vertexNameFromOrigin(origin *resource.Origin) string {
 	case origin.Repo != "":
 		// Remote resource
 		if origin.Ref != "" {
-			return fmt.Sprintf("%s?ref=%s", origin.Path, origin.Ref)
+			return fmt.Sprintf("%s?ref=%s", path, origin.Ref)
 		}
-		return origin.Path
+		return path
 	default:
 		// Local resource
-		return origin.Path
+		return path
 	}
 }
 
