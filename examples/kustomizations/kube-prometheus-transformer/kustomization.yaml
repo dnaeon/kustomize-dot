@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: kube-prometheus
+
+buildMetadata:
+  - originAnnotations
+
+resources:
+  - https://github.com/prometheus-operator/kube-prometheus//
+
+transformers:
+  - transformer.yaml

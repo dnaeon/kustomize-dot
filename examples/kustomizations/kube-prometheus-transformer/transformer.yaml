@@ -1,0 +1,43 @@
+---
+apiVersion: dnaeon.github.io/v1
+kind: KustomizeDot
+metadata:
+  name: kustomize-dot
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: dnaeon/kustomize-dot:latest
+spec:
+  # Graph layout direction - TB, BT, LR or RL
+  layout: LR
+
+  # Highlight resources of a given kind with the specified color
+  highlightKinds:
+    Deployment: green
+    Service: yellow
+    Role: pink
+
+  # Highlight all resources from a given namespace with the specified color
+  highlightNamespaces:
+    default: orange
+    kube-system: pink
+
+  # Drop specified resources from the graph
+  dropKinds:
+    # - ConfigMap
+    # - RoleBinding
+
+  # Drop all resources from the specified namespaces
+  dropNamespaces:
+    - foo
+    - bar
+
+  # Keep the specified resources only and drop anything else
+  keepKinds:
+    # - baz
+    # - qux
+
+  # Keep the resources from the specified namespaces only, and drop anything
+  # else.
+  keepNamespaces:
+    # - monitoring
