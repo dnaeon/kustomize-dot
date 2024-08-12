@@ -11,13 +11,13 @@ which generates a graph of Kubernetes resources and their origin.
 
 ![Hello World](./images/hello-world.svg)
 
-## Requirements
+# Requirements
 
 * Go version 1.22.x or later
 * Docker for local development
 * [kustomize](https://kustomize.io/) for building manifests
 
-## Installation
+# Installation
 
 There are multiple ways to install `kustomize-dot`.
 
@@ -41,11 +41,25 @@ Build a Docker image of `kustomize-dot`.
 make docker-build
 ```
 
-## Usage
+# Usage
+
+`kustomize-dot` can operate in two modes - as a standalone CLI application, or
+as a
+[KRM Function plugin](https://kubectl.docs.kubernetes.io/guides/extending_kustomize/containerized_krm_functions/).
 
 In order to generate a graph of the Kubernetes resources and their origin when
 building a kustomization target we need to enable the `originAnnotations` build
 option in our `kustomization.yaml` file.
+
+``` yaml
+buildMetadata:
+  - originAnnotations
+```
+
+## CLI
+
+The following section provides some examples on how to use `kustomize-dot` as a
+standalone CLI app.
 
 The following example is based on the official
 [kustomize helloWorld example](https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld).
@@ -100,9 +114,10 @@ confusing.
 
 `kustomize-dot` is flexible and supports filtering of resources, highlighting of
 resources or whole namespaces, setting graph layout direction, etc. This is
-useful when we want to get a more focused view of the resulting graph. For
-example the following graph will _keep_ only resources from the `default` and
-`kube-system` namespaces.
+useful when we want to get a more focused view of the resulting graph.
+
+For example the following graph will _keep_ only resources from the `default`
+and `kube-system` namespaces.
 
 ``` shell
 kustomize-dot generate -f examples/resources/kube-prometheus.yaml \
@@ -143,7 +158,7 @@ And this is what the graph for the `ConfigMap` resources looks like.
 
 The `--keep-kind`, `--keep-namespace`, `--drop-kind`, `--drop-namespace`,
 `--highlight-kind` and `--highlight-namespace` options may be repeated any
-number of times, which allows the filters to be applied on many resources kinds
+number of times, which allows the filters to be applied on many resource kinds
 and namespaces.
 
 This example keeps resources from the `monitoring` namespace only, but drops all
@@ -166,9 +181,112 @@ The resulting graph looks like this.
 
 ![kube-prometheus-4](./images/kube-prometheus-4.svg)
 
-TODO: Add usage as KRM Function plugin
+## KRM Function
 
-## Tests
+When `kustomize-dot` is invoked as a [KRM Function
+plugin](https://kubectl.docs.kubernetes.io/guides/extending_kustomize/containerized_krm_functions/)
+it acts as a transformer in accordance to the [KRM Function
+spec](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md),
+which accepts a `ResourceList` as input on `stdin` and outputs a single
+`ConfigMap` with the [Dot
+representation](https://graphviz.org/doc/info/lang.html) of the resources and
+their origin on `stdout`.
+
+The KRM Function supports the same features as the CLI application, allowing the
+user to filter out specific resources, set graph layout and highlight resources
+and namespaces.
+
+The following is an example configuration for the `kustomize-dot` KRM Function
+plugin. You can find this example in the
+[examples/kustomizations/kube-prometheus-transformer](./examples/kustomizations/kube-prometheus-transformer)
+directory of this repo.
+
+``` yaml
+# transformer.yaml
+---
+apiVersion: dnaeon.github.io/v1
+kind: KustomizeDot
+metadata:
+  name: kustomize-dot
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: dnaeon/kustomize-dot:latest
+spec:
+  # Graph layout direction - TB, BT, LR or RL
+  layout: LR
+
+  # Highlight resources of a given kind with the specified color
+  highlightKinds:
+    Deployment: green
+    Service: yellow
+    Role: pink
+
+  # Highlight all resources from a given namespace with the specified color
+  highlightNamespaces:
+    default: orange
+    kube-system: pink
+
+  # Drop specified resources from the graph
+  dropKinds:
+    # - ConfigMap
+    # - RoleBinding
+
+  # Drop all resources from the specified namespaces
+  dropNamespaces:
+    - foo
+    - bar
+
+  # Keep the specified resources only and drop anything else
+  keepKinds:
+    # - baz
+    # - qux
+
+  # Keep the resources from the specified namespaces only, and drop anything
+  # else.
+  keepNamespaces:
+    # - monitoring
+```
+
+And this is an example kustomization file, which uses our KRM Function plugin as
+a transformer.
+
+``` yaml
+# kustomization.yaml
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: kube-prometheus
+
+buildMetadata:
+  - originAnnotations
+
+resources:
+  - https://github.com/prometheus-operator/kube-prometheus//
+
+transformers:
+  - transformer.yaml
+```
+
+The following command will build the manifests and then pass them to our plugin,
+which will generate the Dot representation of the resources. The output will
+contain a single `ConfigMap` named `kustomize-dot`, whose data is the actual
+`dot` representation of the graph.
+
+``` shell
+kustomize build --enable-alpha-plugins examples/kustomizations/kube-prometheus-transformer
+```
+
+Or you can pipe the output directly to `dot(1)` and render the graph, e.g.
+
+``` shell
+kustomize build --enable-alpha-plugins examples/kustomizations/kube-prometheus-transformer \
+    yq '.data.dot' \
+    dot -Tsvg -o graph.svg
+```
+
+# Tests
 
 Run the tests.
 
@@ -182,13 +300,13 @@ Run test coverage.
 make test-cover
 ```
 
-## Contributing
+# Contributing
 
 `kustomize-dot` is hosted on
 [Github](https://github.com/dnaeon/kustomize-dot). Please contribute by
 reporting issues, suggesting features or by sending patches using pull requests.
 
-## License
+# License
 
 `kustomize-dot` is Open Source and licensed under the [BSD
 License](http://opensource.org/licenses/BSD-2-Clause).
