@@ -394,9 +394,6 @@ func (p *Parser) vertexNameFromOrigin(origin *resource.Origin) string {
 		return origin.ConfiguredIn
 	case origin.Repo != "":
 		// Remote resource
-		if origin.Ref != "" {
-			return fmt.Sprintf("%s?ref=%s", path, origin.Ref)
-		}
 		return path
 	default:
 		// Local resource
@@ -412,6 +409,9 @@ func (p *Parser) edgeLabelFromOrigin(origin *resource.Origin) string {
 		return fmt.Sprintf("%s/%s", origin.ConfiguredBy.APIVersion, origin.ConfiguredBy.Kind)
 	case origin.Repo != "":
 		// Remote resource
+		if origin.Ref != "" {
+			return fmt.Sprintf("%s (ref %s)", origin.Repo, origin.Ref)
+		}
 		return origin.Repo
 	default:
 		// Local resource
