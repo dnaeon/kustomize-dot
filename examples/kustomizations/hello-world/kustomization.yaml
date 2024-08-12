@@ -8,4 +8,4 @@ buildMetadata:
   - originAnnotations
 
 resources:
-  - https://github.com/kubernetes-sigs/kustomize//examples/helloWorld/?timeout=120
+  - https://github.com/kubernetes-sigs/kustomize//examples/helloWorld?ref=v1.0.6

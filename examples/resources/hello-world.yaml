@@ -8,6 +8,7 @@ metadata:
     config.kubernetes.io/origin: |
       path: examples/helloWorld/configMap.yaml
       repo: https://github.com/kubernetes-sigs/kustomize
+      ref: v1.0.6
   labels:
     app: hello
   name: the-map
@@ -19,6 +20,7 @@ metadata:
     config.kubernetes.io/origin: |
       path: examples/helloWorld/service.yaml
       repo: https://github.com/kubernetes-sigs/kustomize
+      ref: v1.0.6
   labels:
     app: hello
   name: the-service
@@ -39,6 +41,7 @@ metadata:
     config.kubernetes.io/origin: |
       path: examples/helloWorld/deployment.yaml
       repo: https://github.com/kubernetes-sigs/kustomize
+      ref: v1.0.6
   labels:
     app: hello
   name: the-deployment
@@ -47,7 +50,6 @@ spec:
   selector:
     matchLabels:
       app: hello
-      deployment: hello
   template:
     metadata:
       labels:
