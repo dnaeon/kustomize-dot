@@ -23,7 +23,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-package parser_test
+package parser
 
 import (
 	"errors"
@@ -31,7 +31,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dnaeon/kustomize-dot/pkg/parser"
+	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -123,8 +123,8 @@ spec:
 
 	for _, tc := range testCases {
 		// Parse resources from bytes
-		t.Run(fmt.Sprintf("parser.ResourcesFromBytes with %s", tc.desc), func(t *testing.T) {
-			gotResources, err := parser.ResourcesFromBytes([]byte(tc.data))
+		t.Run(fmt.Sprintf("ResourcesFromBytes with %s", tc.desc), func(t *testing.T) {
+			gotResources, err := ResourcesFromBytes([]byte(tc.data))
 			if !errors.Is(err, tc.wantError) {
 				t.Fatalf("want %v error, got %v", tc.wantError, err)
 			}
@@ -136,13 +136,67 @@ spec:
 
 		t.Run(fmt.Sprintf("parser.ResourcesFromReader with %s", tc.desc), func(t *testing.T) {
 			reader := strings.NewReader(tc.data)
-			gotResources, err := parser.ResourcesFromReader(reader)
+			gotResources, err := ResourcesFromReader(reader)
 			if !errors.Is(err, tc.wantError) {
 				t.Fatalf("want %v error, got %v", tc.wantError, err)
 			}
 
 			if len(gotResources) != tc.wantResources {
 				t.Fatalf("got %d resource(s), want %d", len(gotResources), tc.wantResources)
+			}
+		})
+	}
+}
+
+func TestEdgeLabelFromOrigin(t *testing.T) {
+	type testCase struct {
+		desc      string
+		wantLabel string
+		origin    *resource.Origin
+	}
+
+	testCases := []testCase{
+		{
+			desc:      "local resource",
+			wantLabel: "",
+			origin:    &resource.Origin{},
+		},
+		{
+			desc:      "generator / transformer created resource",
+			wantLabel: "v1/my-generator",
+			origin: &resource.Origin{
+				ConfiguredIn: "foo",
+				ConfiguredBy: yaml.ResourceIdentifier{
+					TypeMeta: yaml.TypeMeta{
+						APIVersion: "v1",
+						Kind:       "my-generator",
+					},
+				},
+			},
+		},
+		{
+			desc:      "remote resource without ref",
+			wantLabel: "github.com/dnaeon/kustomize-dot",
+			origin: &resource.Origin{
+				Repo: "github.com/dnaeon/kustomize-dot",
+			},
+		},
+		{
+			desc:      "remote resource with ref",
+			wantLabel: "github.com/dnaeon/kustomize-dot (ref v1)",
+			origin: &resource.Origin{
+				Repo: "github.com/dnaeon/kustomize-dot",
+				Ref:  "v1",
+			},
+		},
+	}
+
+	p := New()
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			gotLabel := p.edgeLabelFromOrigin(tc.origin)
+			if gotLabel != tc.wantLabel {
+				t.Fatalf("want edge label %q, got label %q", tc.wantLabel, gotLabel)
 			}
 		})
 	}
