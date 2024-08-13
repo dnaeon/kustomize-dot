@@ -201,3 +201,65 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 		})
 	}
 }
+
+func TestVertexNameFromResource(t *testing.T) {
+	configMap, err := NewResourceFactory().FromMapWithName(
+		"kustomize-dot",
+		map[string]any{
+			"apiVersion": "v1",
+			"kind":       "ConfigMap",
+			"metadata": map[string]string{
+				"name":      "kustomize-dot",
+				"namespace": "default",
+			},
+			"data": map[string]string{
+				"foo": "bar",
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal("failed to create ConfigMap resource")
+	}
+
+	namespace, err := NewResourceFactory().FromMapWithName(
+		"default",
+		map[string]any{
+			"apiVersion": "v1",
+			"kind":       "Namespace",
+			"metadata": map[string]string{
+				"name": "default",
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal("failed to create Namespace resource")
+	}
+
+	type testCase struct {
+		desc     string
+		wantName string
+		resource *resource.Resource
+	}
+	testCases := []testCase{
+		{
+			desc:     "namespace resource",
+			wantName: "namespace/default",
+			resource: namespace,
+		},
+		{
+			desc:     "ConfigMap resource",
+			wantName: "default/configmap/kustomize-dot",
+			resource: configMap,
+		},
+	}
+
+	p := New()
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			gotName := p.vertexNameFromResource(tc.resource)
+			if gotName != tc.wantName {
+				t.Fatalf("want vertex name %q, got name %q", tc.wantName, gotName)
+			}
+		})
+	}
+}
