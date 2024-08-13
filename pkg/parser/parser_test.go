@@ -27,13 +27,15 @@ package parser_test
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/dnaeon/kustomize-dot/pkg/parser"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-func TestResourcesFromBytes(t *testing.T) {
+func TestParseResources(t *testing.T) {
 	type testCase struct {
 		data          string
 		desc          string
@@ -120,7 +122,8 @@ spec:
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.desc, func(t *testing.T) {
+		// Parse resources from bytes
+		t.Run(fmt.Sprintf("parser.ResourcesFromBytes with %s", tc.desc), func(t *testing.T) {
 			gotResources, err := parser.ResourcesFromBytes([]byte(tc.data))
 			if !errors.Is(err, tc.wantError) {
 				t.Fatalf("want %v error, got %v", tc.wantError, err)
@@ -130,14 +133,17 @@ spec:
 				t.Fatalf("got %d resource(s), want %d", len(gotResources), tc.wantResources)
 			}
 		})
+
+		t.Run(fmt.Sprintf("parser.ResourcesFromReader with %s", tc.desc), func(t *testing.T) {
+			reader := strings.NewReader(tc.data)
+			gotResources, err := parser.ResourcesFromReader(reader)
+			if !errors.Is(err, tc.wantError) {
+				t.Fatalf("want %v error, got %v", tc.wantError, err)
+			}
+
+			if len(gotResources) != tc.wantResources {
+				t.Fatalf("got %d resource(s), want %d", len(gotResources), tc.wantResources)
+			}
+		})
 	}
-}
-
-func TestResourcesFromRNodes(t *testing.T) {
-}
-
-func TestResourcesFromPath(t *testing.T) {
-}
-
-func TestResourcesFromReader(t *testing.T) {
 }
