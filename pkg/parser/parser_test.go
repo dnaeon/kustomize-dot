@@ -159,12 +159,15 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 		{
 			desc:      "local resource",
 			wantLabel: "",
-			origin:    &resource.Origin{},
+			origin: &resource.Origin{
+				Path: "foo.yaml",
+			},
 		},
 		{
 			desc:      "generator / transformer created resource",
 			wantLabel: "v1/my-generator",
 			origin: &resource.Origin{
+				Path:         "foo.yaml",
 				ConfiguredIn: "foo",
 				ConfiguredBy: yaml.ResourceIdentifier{
 					TypeMeta: yaml.TypeMeta{
@@ -179,6 +182,7 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 			wantLabel: "github.com/dnaeon/kustomize-dot",
 			origin: &resource.Origin{
 				Repo: "github.com/dnaeon/kustomize-dot",
+				Path: "foo.yaml",
 			},
 		},
 		{
@@ -187,6 +191,7 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 			origin: &resource.Origin{
 				Repo: "github.com/dnaeon/kustomize-dot",
 				Ref:  "v1",
+				Path: "foo.yaml",
 			},
 		},
 	}
