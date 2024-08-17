@@ -83,13 +83,13 @@ build`, pipe the resources to `kustomize-dot` for generating the [Dot
 representation](https://graphviz.org/doc/info/lang.html), and finally pipe the
 result to `dot` for rendering the graph, e.g.
 
-The [examples directory](./examples) contains ready to render resources, which
+The [fixtures package](./pkg/fixtures) contains ready to render resources, which
 have already been built using `kustomize build`. The following command will
 render the graph for the [kustomize helloWorld
 example](https://github.com/kubernetes-sigs/kustomize/tree/master/examples/helloWorld).
 
 ``` shell
-kustomize-dot generate -f examples/resources/hello-world.yaml | \
+kustomize-dot generate -f pkg/fixtures/hello-world.yaml | \
     dot -T svg -o graph.svg
 ```
 
@@ -97,16 +97,16 @@ Or you could execute the following command instead, which will generate the same
 graph.
 
 ``` shell
-kustomize build examples/kustomizations/hello-world | \
+kustomize build examples/hello-world | \
     kustomize-dot generate -f - | \
     dot -T svg -o graph.svg
 ```
 
 The following example builds the graph of resources for
-[kube-prometheus operator](https://github.com/prometheus-operator/kube-prometheus)
+[kube-prometheus operator](https://github.com/prometheus-operator/kube-prometheus).
 
 ``` shell
-kustomize-dot generate -f examples/resources/kube-prometheus.yaml
+kustomize-dot generate -f pkg/fixtures/kube-prometheus.yaml
 ```
 
 The [resulting graph is big](./images/kube-prometheus-full.svg) enough to be
@@ -120,7 +120,7 @@ For example the following graph will _keep_ only resources from the `default`
 and `kube-system` namespaces.
 
 ``` shell
-kustomize-dot generate -f examples/resources/kube-prometheus.yaml \
+kustomize-dot generate -f pkg/fixtures/kube-prometheus.yaml \
     --keep-namespace default \
     --keep-namespace kube-system
 ```
@@ -132,7 +132,7 @@ The result looks like this.
 We can also highlight the resources from the different namespaces, e.g.
 
 ```shell
-kustomize-dot generate -f examples/resources/kube-prometheus.yaml \
+kustomize-dot generate -f pkg/fixtures/kube-prometheus.yaml \
     --keep-namespace default \
     --keep-namespace kube-system \
     --highlight-namespace default=pink \
@@ -147,7 +147,7 @@ The following example will keep only the `ConfigMap` resources from the
 `monitoring` namespace.
 
 ```shell
-kustomize-dot generate -f examples/resources/kube-prometheus.yaml \
+kustomize-dot generate -f pkg/fixtures/kube-prometheus.yaml \
     --keep-namespace monitoring \
     --keep-kind ConfigMap
 ```
@@ -166,7 +166,7 @@ This example keeps resources from the `monitoring` namespace only, but drops all
 colors.
 
 ``` shell
-kustomize-dot generate -f examples/resources/kube-prometheus.yaml \
+kustomize-dot generate -f pkg/fixtures/kube-prometheus.yaml \
     --keep-namespace monitoring \
     --drop-kind ConfigMap \
     --highlight-kind service=yellow \
@@ -198,7 +198,7 @@ and namespaces.
 
 The following is an example configuration for the `kustomize-dot` KRM Function
 plugin. You can find this example in the
-[examples/kustomizations/kube-prometheus-transformer](./examples/kustomizations/kube-prometheus-transformer)
+[examples/kube-prometheus-transformer](./examples/kube-prometheus-transformer)
 directory of this repo.
 
 ``` yaml
@@ -275,13 +275,13 @@ contain a single `ConfigMap` named `kustomize-dot`, whose data is the actual
 `dot` representation of the graph.
 
 ``` shell
-kustomize build --enable-alpha-plugins examples/kustomizations/kube-prometheus-transformer
+kustomize build --enable-alpha-plugins examples/kube-prometheus-transformer
 ```
 
 Or you can pipe the output directly to `dot(1)` and render the graph, e.g.
 
 ``` shell
-kustomize build --enable-alpha-plugins examples/kustomizations/kube-prometheus-transformer \
+kustomize build --enable-alpha-plugins examples/kube-prometheus-transformer \
     yq '.data.dot' \
     dot -Tsvg -o graph.svg
 ```
