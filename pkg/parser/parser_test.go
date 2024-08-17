@@ -120,24 +120,27 @@ metadata:
 	}
 }
 
-func TestEdgeLabelFromOrigin(t *testing.T) {
+func TestVertexNameAndEdgeLabelFromOrigin(t *testing.T) {
 	type testCase struct {
-		desc      string
-		wantLabel string
-		origin    *resource.Origin
+		desc           string
+		wantEdgeLabel  string
+		wantVertexName string
+		origin         *resource.Origin
 	}
 
 	testCases := []testCase{
 		{
-			desc:      "local resource",
-			wantLabel: "",
+			desc:           "local resource",
+			wantVertexName: "foo.yaml",
+			wantEdgeLabel:  "",
 			origin: &resource.Origin{
 				Path: "foo.yaml",
 			},
 		},
 		{
-			desc:      "generator / transformer created resource",
-			wantLabel: "v1/my-generator",
+			desc:           "generator / transformer created resource",
+			wantVertexName: "foo",
+			wantEdgeLabel:  "v1/my-generator",
 			origin: &resource.Origin{
 				Path:         "foo.yaml",
 				ConfiguredIn: "foo",
@@ -150,16 +153,18 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 			},
 		},
 		{
-			desc:      "remote resource without ref",
-			wantLabel: "github.com/dnaeon/kustomize-dot",
+			desc:           "remote resource without ref",
+			wantVertexName: "foo.yaml",
+			wantEdgeLabel:  "github.com/dnaeon/kustomize-dot",
 			origin: &resource.Origin{
 				Repo: "github.com/dnaeon/kustomize-dot",
 				Path: "foo.yaml",
 			},
 		},
 		{
-			desc:      "remote resource with ref",
-			wantLabel: "github.com/dnaeon/kustomize-dot (ref v1)",
+			desc:           "remote resource with ref",
+			wantVertexName: "foo.yaml",
+			wantEdgeLabel:  "github.com/dnaeon/kustomize-dot (ref v1)",
 			origin: &resource.Origin{
 				Repo: "github.com/dnaeon/kustomize-dot",
 				Ref:  "v1",
@@ -171,9 +176,14 @@ func TestEdgeLabelFromOrigin(t *testing.T) {
 	p := New()
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gotLabel := p.edgeLabelFromOrigin(tc.origin)
-			if gotLabel != tc.wantLabel {
-				t.Fatalf("want edge label %q, got label %q", tc.wantLabel, gotLabel)
+			gotVertexName := p.vertexNameFromOrigin(tc.origin)
+			if gotVertexName != tc.wantVertexName {
+				t.Fatalf("want vertex name %q, got name %q", tc.wantVertexName, gotVertexName)
+			}
+
+			gotEdgeLabel := p.edgeLabelFromOrigin(tc.origin)
+			if gotEdgeLabel != tc.wantEdgeLabel {
+				t.Fatalf("want edge label %q, got label %q", tc.wantEdgeLabel, gotEdgeLabel)
 			}
 		})
 	}
