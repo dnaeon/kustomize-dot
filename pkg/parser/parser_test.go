@@ -251,7 +251,7 @@ func TestVertexNameFromResource(t *testing.T) {
 	}
 }
 
-func TestShouldDropResource(t *testing.T) {
+func TestWithKeepAndWithDropOptions(t *testing.T) {
 	// Our test resources
 	configMap, err := NewResourceFactory().FromMapWithName(
 		"kustomize-dot",
@@ -358,6 +358,13 @@ func TestShouldDropResource(t *testing.T) {
 			r:          configMap,
 			shouldDrop: true,
 			opts:       []Option{WithKeepNamespace("default"), WithDropKind("ConfigMap")},
+		},
+		{
+			desc:       "WithKeepNamespace and WithKeepKind - should drop",
+			r:          configMap,
+			shouldDrop: true,
+			// Resource is not a Secret, so it should be dropped
+			opts: []Option{WithKeepNamespace("default"), WithKeepKind("Secret")},
 		},
 	}
 
