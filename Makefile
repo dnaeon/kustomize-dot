@@ -15,10 +15,10 @@ tidy:
 	go mod tidy
 
 test:
-	go test -v -race ./...
+	go test -v -race $(shell go list ./... | grep -E -v 'cmd|fixtures')
 
 test-cover:
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic $(shell go list ./... | grep -E -v 'cmd|fixtures')
 
 docker-build:
 	docker build -t dnaeon/kustomize-dot:latest .
