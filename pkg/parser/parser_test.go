@@ -477,12 +477,11 @@ func TestWithLayoutDirection(t *testing.T) {
 func TestParse(t *testing.T) {
 	type testCase struct {
 		desc          string
-		data          string
-		wantResources int
-		wantVs        int
-		wantEs        int
-		wantError     error
-		opts          []Option
+		data          string   // data from which to get raw resources
+		wantResources int      // number of resources we get from the raw data
+		wantVs        int      // number of expected vertices in the graph
+		wantEs        int      // number of expected edges in the graph
+		opts          []Option // options with which to configure the parser
 	}
 
 	testCases := []testCase{
@@ -492,7 +491,6 @@ func TestParse(t *testing.T) {
 			wantResources: 0,
 			wantVs:        0,
 			wantEs:        0,
-			wantError:     nil,
 			opts:          []Option{},
 		},
 		{
@@ -501,8 +499,31 @@ func TestParse(t *testing.T) {
 			wantResources: 3,
 			wantVs:        6, // 3 resources + 3 origins
 			wantEs:        3,
-			wantError:     nil,
 			opts:          []Option{},
+		},
+		{
+			desc:          "hello world resources - WithDropKind",
+			data:          fixtures.HelloWorld,
+			wantResources: 3,
+			wantVs:        4, // 2 resources + 2 origins
+			wantEs:        2,
+			opts:          []Option{WithDropKind("Service")},
+		},
+		{
+			desc:          "hello world resources - WithDropNamespace",
+			data:          fixtures.HelloWorld,
+			wantResources: 3,
+			wantVs:        0,
+			wantEs:        0,
+			opts:          []Option{WithDropNamespace("default")},
+		},
+		{
+			desc:          "hello world resources - WithKeepNamespace",
+			data:          fixtures.HelloWorld,
+			wantResources: 3,
+			wantVs:        0,
+			wantEs:        0,
+			opts:          []Option{WithKeepNamespace("foobar")}, // Resources are from default namespace
 		},
 	}
 
