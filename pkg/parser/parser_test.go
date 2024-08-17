@@ -323,6 +323,42 @@ func TestShouldDropResource(t *testing.T) {
 			shouldDrop: false,
 			opts:       []Option{WithDropKind("Secret")}, // Resource is a ConfigMap
 		},
+		{
+			desc:       "WithKeepKind - should drop",
+			r:          configMap,
+			shouldDrop: true,
+			opts:       []Option{WithKeepKind("Secret")}, // Resource is a ConfigMap
+		},
+		{
+			desc:       "WithKeepKind - should persist",
+			r:          configMap,
+			shouldDrop: false,
+			opts:       []Option{WithKeepKind("ConfigMap")},
+		},
+		{
+			desc:       "WithKeepNamespace - should persist",
+			r:          configMap,
+			shouldDrop: false,
+			opts:       []Option{WithKeepNamespace("default")},
+		},
+		{
+			desc:       "WithKeepNamespace - should drop",
+			r:          configMap,
+			shouldDrop: true,
+			opts:       []Option{WithKeepNamespace("foobar")}, // Resource is in the default namespace
+		},
+		{
+			desc:       "WithKeepNamespace - should persist cluster scoped resource",
+			r:          namespace,
+			shouldDrop: false,
+			opts:       []Option{WithKeepNamespace("foobar")}, // Resource is cluster-scoped
+		},
+		{
+			desc:       "WithKeepNamespace and WithDropKind - should drop",
+			r:          configMap,
+			shouldDrop: true,
+			opts:       []Option{WithKeepNamespace("default"), WithDropKind("ConfigMap")},
+		},
 	}
 
 	for _, tc := range testCases {
