@@ -28,6 +28,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"testing"
 
@@ -374,6 +375,64 @@ func TestWithKeepAndWithDropOptions(t *testing.T) {
 			gotShouldDrop := p.shouldDropResource(tc.r)
 			if gotShouldDrop != tc.shouldDrop {
 				t.Fatalf("shouldDrop() returned %t, expected %t", gotShouldDrop, tc.shouldDrop)
+			}
+		})
+	}
+}
+
+func TestWithHighlightOptions(t *testing.T) {
+	type testCase struct {
+		desc                      string
+		opts                      []Option
+		wantHighlightKindMap      map[string]string
+		wantHighlightNamespaceMap map[string]string
+	}
+
+	testCases := []testCase{
+		{
+			desc:                      "empty opts - no highlights",
+			opts:                      []Option{},
+			wantHighlightKindMap:      map[string]string{},
+			wantHighlightNamespaceMap: map[string]string{},
+		},
+		{
+			desc: "WithHighlightKind - multiple highlights",
+			opts: []Option{
+				WithHighlightKind("ConfigMap", "red"),
+				WithHighlightKind("Secret", "green"),
+				WithHighlightKind("Namespace", "blue"),
+			},
+			wantHighlightKindMap: map[string]string{
+				"configmap": "red",
+				"secret":    "green",
+				"namespace": "blue",
+			},
+			wantHighlightNamespaceMap: map[string]string{},
+		},
+		{
+			desc: "WithHighlightNamespace - multiple highlights",
+			opts: []Option{
+				WithHighlightNamespace("foo", "red"),
+				WithHighlightNamespace("bar", "green"),
+				WithHighlightNamespace("baz", "blue"),
+			},
+			wantHighlightKindMap: map[string]string{},
+			wantHighlightNamespaceMap: map[string]string{
+				"foo": "red",
+				"bar": "green",
+				"baz": "blue",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			p := New(tc.opts...)
+			if !maps.Equal(p.highlightKindMap, tc.wantHighlightKindMap) {
+				t.Fatalf("want highlightKindMap %v, got %v", tc.wantHighlightKindMap, p.highlightKindMap)
+			}
+			if !maps.Equal(p.highlightNamespaceMap, tc.wantHighlightNamespaceMap) {
+				t.Fatalf("want highlightNamespaceMap %v, got %v", tc.wantHighlightNamespaceMap, p.highlightNamespaceMap)
 			}
 		})
 	}
