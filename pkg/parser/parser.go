@@ -372,10 +372,11 @@ func (p *Parser) applyHighlights(u *graph.Vertex[string], r *resource.Resource) 
 func (p *Parser) vertexNameFromResource(r *resource.Resource) string {
 	namespace := r.GetNamespace()
 	name := r.GetName()
+	gvk := r.GetGvk()
 	kind := strings.ToLower(r.GetKind())
 
 	// Cluster-scoped resource
-	if namespace == "" {
+	if gvk.IsClusterScoped() {
 		return fmt.Sprintf("%s/%s", kind, name)
 	}
 
