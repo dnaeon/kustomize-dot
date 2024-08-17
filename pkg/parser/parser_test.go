@@ -31,6 +31,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dnaeon/kustomize-dot/pkg/fixtures"
+
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -72,45 +74,9 @@ metadata:
 			wantResources: 1,
 		},
 		{
-			desc: "multiple resources",
-			data: `
-apiVersion: v1
-data:
-  altGreeting: Good Morning!
-  enableRisky: "false"
-kind: ConfigMap
-metadata:
-  annotations:
-    config.kubernetes.io/origin: |
-      path: examples/helloWorld/configMap.yaml
-      repo: https://github.com/kubernetes-sigs/kustomize
-      ref: v1.0.6
-  labels:
-    app: hello
-  name: the-map
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    config.kubernetes.io/origin: |
-      path: examples/helloWorld/service.yaml
-      repo: https://github.com/kubernetes-sigs/kustomize
-      ref: v1.0.6
-  labels:
-    app: hello
-  name: the-service
-spec:
-  ports:
-  - port: 8666
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app: hello
-    deployment: hello
-  type: LoadBalancer
-`,
-			wantResources: 2,
+			desc:          "hello world resources",
+			data:          fixtures.HelloWorld,
+			wantResources: 3,
 			wantError:     nil,
 		},
 		{
