@@ -12,6 +12,7 @@ metadata:
   labels:
     app: hello
   name: the-map
+  namespace: default
 ---
 apiVersion: v1
 kind: Service
@@ -24,6 +25,7 @@ metadata:
   labels:
     app: hello
   name: the-service
+  namespace: default
 spec:
   ports:
   - port: 8666
@@ -45,6 +47,7 @@ metadata:
   labels:
     app: hello
   name: the-deployment
+  namespace: default
 spec:
   replicas: 3
   selector:
