@@ -80,6 +80,12 @@ metadata:
 			wantError:     nil,
 		},
 		{
+			desc:          "kube prometheus resources",
+			data:          fixtures.KubePrometheus,
+			wantResources: 124,
+			wantError:     nil,
+		},
+		{
 			desc:          "bad data",
 			data:          "some bad data in here",
 			wantResources: 0,
