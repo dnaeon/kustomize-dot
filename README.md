@@ -81,7 +81,7 @@ resources:
 In order to generate the graph we can build the manifests using `kustomize
 build`, pipe the resources to `kustomize-dot` for generating the [Dot
 representation](https://graphviz.org/doc/info/lang.html), and finally pipe the
-result to `dot` for rendering the graph, e.g.
+result to `dot` for rendering the graph.
 
 The [fixtures package](./pkg/fixtures) contains ready to render resources, which
 have already been built using `kustomize build`. The following command will
@@ -281,8 +281,8 @@ kustomize build --enable-alpha-plugins examples/kube-prometheus-transformer
 Or you can pipe the output directly to `dot(1)` and render the graph, e.g.
 
 ``` shell
-kustomize build --enable-alpha-plugins examples/kube-prometheus-transformer \
-    yq '.data.dot' \
+kustomize build --enable-alpha-plugins examples/kube-prometheus-transformer | \
+    yq '.data.dot' | \
     dot -Tsvg -o graph.svg
 ```
 
