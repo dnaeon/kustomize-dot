@@ -287,6 +287,7 @@ func (p *Parser) Parse(resources []*resource.Resource) (graph.Graph[string], err
 func (p *Parser) shouldDropResource(r *resource.Resource) bool {
 	kind := strings.ToLower(r.GetKind())
 	namespace := strings.ToLower(r.GetNamespace())
+	gvk := r.GetGvk()
 
 	// Drop resource, if it is part of any drop-namespaces
 	for _, dn := range p.dropNamespaces {
@@ -307,7 +308,7 @@ func (p *Parser) shouldDropResource(r *resource.Resource) bool {
 	keepKindIsSet := false
 	foundKeepNamespace := false
 	foundKeepKind := false
-	if len(p.keepNamespaces) > 0 {
+	if len(p.keepNamespaces) > 0 && !gvk.IsClusterScoped() {
 		keepNamespaceIsSet = true
 		for _, kn := range p.keepNamespaces {
 			if namespace == kn {
