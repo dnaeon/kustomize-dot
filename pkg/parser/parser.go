@@ -392,11 +392,7 @@ func (p *Parser) vertexNameFromOrigin(origin *resource.Origin) string {
 	case origin.ConfiguredIn != "":
 		// Generator or transformer created resource
 		return origin.ConfiguredIn
-	case origin.Repo != "":
-		// Remote resource
-		return path
 	default:
-		// Local resource
 		return path
 	}
 }

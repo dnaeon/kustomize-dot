@@ -250,3 +250,88 @@ func TestVertexNameFromResource(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldDropResource(t *testing.T) {
+	// Our test resources
+	configMap, err := NewResourceFactory().FromMapWithName(
+		"kustomize-dot",
+		map[string]any{
+			"apiVersion": "v1",
+			"kind":       "ConfigMap",
+			"metadata": map[string]string{
+				"name":      "kustomize-dot",
+				"namespace": "default",
+			},
+			"data": map[string]string{
+				"foo": "bar",
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal("failed to create ConfigMap resource")
+	}
+
+	namespace, err := NewResourceFactory().FromMapWithName(
+		"default",
+		map[string]any{
+			"apiVersion": "v1",
+			"kind":       "Namespace",
+			"metadata": map[string]string{
+				"name": "default",
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal("failed to create Namespace resource")
+	}
+
+	type testCase struct {
+		desc       string
+		r          *resource.Resource
+		shouldDrop bool
+		opts       []Option
+	}
+
+	testCases := []testCase{
+		{
+			desc:       "empty opts - should persist resource",
+			r:          configMap,
+			shouldDrop: false,
+			opts:       []Option{},
+		},
+		{
+			desc:       "WithDropNamespace - should drop",
+			r:          configMap,
+			shouldDrop: true,
+			opts:       []Option{WithDropNamespace("default")},
+		},
+		{
+			desc:       "WithDropNamespace - should persist",
+			r:          configMap,
+			shouldDrop: false,
+			opts:       []Option{WithDropNamespace("foobar")}, // Resource is in the default namespace
+		},
+		{
+			desc:       "WithDropKind - should drop",
+			r:          namespace,
+			shouldDrop: true,
+			opts:       []Option{WithDropKind("Namespace")},
+		},
+		{
+			desc:       "WithDropKind - should persist",
+			r:          configMap,
+			shouldDrop: false,
+			opts:       []Option{WithDropKind("Secret")}, // Resource is a ConfigMap
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			p := New(tc.opts...)
+			gotShouldDrop := p.shouldDropResource(tc.r)
+			if gotShouldDrop != tc.shouldDrop {
+				t.Fatalf("shouldDrop() returned %t, expected %t", gotShouldDrop, tc.shouldDrop)
+			}
+		})
+	}
+}
