@@ -473,3 +473,66 @@ func TestWithLayoutDirection(t *testing.T) {
 		})
 	}
 }
+
+func TestParse(t *testing.T) {
+	type testCase struct {
+		desc          string
+		data          string
+		wantResources int
+		wantVs        int
+		wantEs        int
+		wantError     error
+		opts          []Option
+	}
+
+	testCases := []testCase{
+		{
+			desc:          "empty data - no options",
+			data:          "",
+			wantResources: 0,
+			wantVs:        0,
+			wantEs:        0,
+			wantError:     nil,
+			opts:          []Option{},
+		},
+		{
+			desc:          "hello world resources - no options",
+			data:          fixtures.HelloWorld,
+			wantResources: 3,
+			wantVs:        6, // 3 resources + 3 origins
+			wantEs:        3,
+			wantError:     nil,
+			opts:          []Option{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			reader := strings.NewReader(tc.data)
+			gotResources, err := ResourcesFromReader(reader)
+			if err != nil {
+				t.Fatalf("parsing resources failed: %s", err)
+			}
+
+			if len(gotResources) != tc.wantResources {
+				t.Fatalf("got %d resource(s), want %d", len(gotResources), tc.wantResources)
+			}
+
+			p := New(tc.opts...)
+			g, err := p.Parse(gotResources)
+			if err != nil {
+				t.Fatalf("failed to parse resources as graph: %s", err)
+			}
+
+			gotVs := g.GetVertices()
+			if tc.wantVs != len(gotVs) {
+				t.Fatalf("want |V|=%d, got |V|=%d", tc.wantVs, len(gotVs))
+			}
+
+			gotEs := g.GetEdges()
+			if tc.wantEs != len(gotEs) {
+				t.Fatalf("want |E|=%d, got |E|=%d", tc.wantEs, len(gotEs))
+			}
+		})
+	}
+}
