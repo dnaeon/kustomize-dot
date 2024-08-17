@@ -437,3 +437,39 @@ func TestWithHighlightOptions(t *testing.T) {
 		})
 	}
 }
+
+func TestWithLayoutDirection(t *testing.T) {
+	type testCase struct {
+		desc                string
+		opts                []Option
+		wantLayoutDirection LayoutDirection
+		wantLayoutStr       string
+	}
+
+	testCases := []testCase{
+		{
+			desc:                "no layout specified - defaults to LR",
+			opts:                []Option{},
+			wantLayoutDirection: LayoutDirectionLR,
+			wantLayoutStr:       "LR",
+		},
+		{
+			desc:                "WithLayoutDirection specified",
+			opts:                []Option{WithLayoutDirection(LayoutDirectionBT)},
+			wantLayoutDirection: LayoutDirectionBT,
+			wantLayoutStr:       "BT",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			p := New(tc.opts...)
+			if p.layoutDirection != tc.wantLayoutDirection {
+				t.Fatalf("want layout direction %v, got %v", tc.wantLayoutDirection, p.layoutDirection)
+			}
+			if p.layoutDirection.String() != tc.wantLayoutStr {
+				t.Fatalf("want layout string %v, got %v", tc.wantLayoutStr, p.layoutDirection)
+			}
+		})
+	}
+}
