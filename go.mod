@@ -3,7 +3,7 @@ module github.com/dnaeon/kustomize-dot
 go 1.22.6
 
 require (
-	github.com/urfave/cli/v2 v2.27.3
+	github.com/urfave/cli/v2 v2.27.4
 	gopkg.in/dnaeon/go-graph.v1 v1.0.1
 	sigs.k8s.io/kustomize/api v0.17.3
 	sigs.k8s.io/kustomize/kyaml v0.17.2
