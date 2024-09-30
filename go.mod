@@ -6,7 +6,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.4
 	gopkg.in/dnaeon/go-graph.v1 v1.0.1
 	sigs.k8s.io/kustomize/api v0.17.3
-	sigs.k8s.io/kustomize/kyaml v0.17.2
+	sigs.k8s.io/kustomize/kyaml v0.18.0
 )
 
 require (
@@ -28,7 +28,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/dnaeon/go-deque.v1 v1.0.0-20220926101334-c8c1a1f04894 // indirect
 	gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.0 // indirect
