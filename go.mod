@@ -6,7 +6,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.5
 	gopkg.in/dnaeon/go-graph.v1 v1.0.1
 	sigs.k8s.io/kustomize/api v0.17.3
-	sigs.k8s.io/kustomize/kyaml v0.18.0
+	sigs.k8s.io/kustomize/kyaml v0.18.1
 )
 
 require (
