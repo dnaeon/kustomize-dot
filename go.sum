@@ -6,6 +6,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/go-echarts/go-echarts/v2 v2.5.4 h1:bw0REczgtgI/o7GPqae4AzsiJwwyJvyWwJ7vuM0G6tQ=
+github.com/go-echarts/go-echarts/v2 v2.5.4/go.mod h1:56YlvzhW/a+du15f3S2qUGNDfKnFOeJSThBIrVFHDtI=
 github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
 github.com/go-errors/errors v1.4.2/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
 github.com/go-openapi/jsonpointer v0.19.6/go.mod h1:osyAmYz/mB/C3I+WsTTSgw1ONzaLJoLCyoi6/zppojs=
@@ -78,12 +80,12 @@ google.golang.org/protobuf v1.35.1/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojt
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
-gopkg.in/dnaeon/go-deque.v1 v1.0.0-20220926101334-c8c1a1f04894 h1:gxr0TTjgWxerNh7DywoDIAceteSUGYkRF5mtE/kr5xE=
-gopkg.in/dnaeon/go-deque.v1 v1.0.0-20220926101334-c8c1a1f04894/go.mod h1:/oUlvC7v/6StKZYUKPFtH7YbgkLITXvh4CMF7cElPo8=
-gopkg.in/dnaeon/go-graph.v1 v1.0.1 h1:Bgnknvuzqypgv/q7URRFxcLs7jX81uExFJKcfSARlMg=
-gopkg.in/dnaeon/go-graph.v1 v1.0.1/go.mod h1:tex4sClma3uVG+1izmSbgQILRr6gz8vmCkDnqlEudWI=
-gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.0 h1:M3Iklm4HCkayoneDcKK9NZgtjGQHBWPA0MF30eNewVA=
-gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.0/go.mod h1:JNUtwj2QQsBHhsIHNjxdDaSmLW4RZtvJHO8VYtsMkY4=
+gopkg.in/dnaeon/go-deque.v1 v1.0.0-20250203064611-7d48f7299755 h1:wB8d7G8z0rrFgS/Wr16pBVL3MxFp8M+/fTJGcBAxn1k=
+gopkg.in/dnaeon/go-deque.v1 v1.0.0-20250203064611-7d48f7299755/go.mod h1:mAZ2p0oPgDAeRlUKq3IJOE9RvqVvA3BIA4WKxG/9zDM=
+gopkg.in/dnaeon/go-graph.v1 v1.0.2 h1:OHShBkXqG65QSQwU0/CQfcqMvJh/+XoR7gZiPprtEVc=
+gopkg.in/dnaeon/go-graph.v1 v1.0.2/go.mod h1:N9qN2W5CwdzCVmrqtLPmQ3HawuV81HBhuIyUJiMoXT0=
+gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.1 h1:AS4IIyStH/47cZpPdBk/Db6QXg+UmcDjZvSOoDgGsbU=
+gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.1/go.mod h1:JNUtwj2QQsBHhsIHNjxdDaSmLW4RZtvJHO8VYtsMkY4=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
