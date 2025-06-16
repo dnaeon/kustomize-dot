@@ -3,14 +3,14 @@ module github.com/dnaeon/kustomize-dot
 go 1.23
 
 require (
-	github.com/urfave/cli/v2 v2.27.6
+	github.com/urfave/cli/v2 v2.27.7
 	gopkg.in/dnaeon/go-graph.v1 v1.0.2
 	sigs.k8s.io/kustomize/api v0.19.0
 	sigs.k8s.io/kustomize/kyaml v0.19.0
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-echarts/go-echarts/v2 v2.5.4 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
