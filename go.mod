@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/urfave/cli/v2 v2.27.7
 	gopkg.in/dnaeon/go-graph.v1 v1.0.2
-	sigs.k8s.io/kustomize/api v0.19.0
+	sigs.k8s.io/kustomize/api v0.20.0
 	sigs.k8s.io/kustomize/kyaml v0.20.0
 )
 
