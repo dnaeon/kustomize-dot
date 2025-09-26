@@ -1,6 +1,6 @@
 module github.com/dnaeon/kustomize-dot
 
-go 1.23
+go 1.24
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
