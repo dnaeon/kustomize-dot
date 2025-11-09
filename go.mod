@@ -1,12 +1,12 @@
 module github.com/dnaeon/kustomize-dot
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
 	gopkg.in/dnaeon/go-graph.v1 v1.0.2
 	sigs.k8s.io/kustomize/api v0.20.1
-	sigs.k8s.io/kustomize/kyaml v0.20.1
+	sigs.k8s.io/kustomize/kyaml v0.21.0
 )
 
 require (
@@ -23,14 +23,14 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/spf13/cobra v1.8.0 // indirect
+	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.3 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	google.golang.org/protobuf v1.36.1 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/dnaeon/go-deque.v1 v1.0.0-20250203064611-7d48f7299755 // indirect
 	gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
