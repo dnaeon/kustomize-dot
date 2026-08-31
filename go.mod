@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
+	github.com/urfave/cli/v3 v3.11.0
 	gopkg.in/dnaeon/go-graph.v1 v1.0.2
 	sigs.k8s.io/kustomize/api v0.21.1
 	sigs.k8s.io/kustomize/kyaml v0.21.1
