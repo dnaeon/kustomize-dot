@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
-	gopkg.in/dnaeon/go-graph.v1 v1.0.2
+	gopkg.in/dnaeon/go-graph.v1 v1.0.3
 	sigs.k8s.io/kustomize/api v0.21.1
 	sigs.k8s.io/kustomize/kyaml v0.21.1
 )
@@ -12,7 +12,7 @@ require (
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/go-echarts/go-echarts/v2 v2.5.4 // indirect
+	github.com/go-echarts/go-echarts/v2 v2.7.2 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
@@ -31,7 +31,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.3 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
-	gopkg.in/dnaeon/go-deque.v1 v1.0.0-20250203064611-7d48f7299755 // indirect
+	gopkg.in/dnaeon/go-deque.v1 v1.0.0-20251121085639-531ddbf8ba89 // indirect
 	gopkg.in/dnaeon/go-priorityqueue.v1 v1.1.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20241212222426-2c72e554b1e7 // indirect
